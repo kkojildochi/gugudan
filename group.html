@@ -702,14 +702,11 @@
     </script>
 
     <script>
-        const MAX_REGULAR_MEMBERS = 5; 
-
         let newbies = [];
         let regulars = [];
         let rooms = []; 
         
         const MAX_ROOMS = 5;
-        const MAX_MEMBERS_PER_ROOM = 6; // 1방장 + 5조원
 
         /* 커스텀 모달 기능 */
         let confirmCallback = null;
@@ -1097,7 +1094,8 @@
             }
 
             container.innerHTML = rooms.map((room, index) => {
-                const maxMembersToAdd = MAX_MEMBERS_PER_ROOM - 1; 
+                const maxMembersToAdd = room.isRotten ? 5 : 3; 
+                const maxTotal = room.isRotten ? 6 : 4;
                 const isFull = room.members.length >= maxMembersToAdd;
                 const totalCount = 1 + room.members.length;
                 const roomName = room.roomName || `${index + 1}조`;
@@ -1112,7 +1110,7 @@
                         <div class="room-title" onclick="editRoomName(${room.id}, '${roomName}')" title="클릭해서 조 이름 변경">
                             ${roomName} <span class="edit-icon">✏️</span>
                         </div>
-                        <div class="room-count">${totalCount}/${MAX_MEMBERS_PER_ROOM}명</div>
+                        <div class="room-count">${totalCount}/${maxTotal}명</div>
                     </div>
                     <div class="room-members">
                         <div class="member ${memberClass}">
@@ -1142,8 +1140,10 @@
                 return;
             }
             
-            const maxMembersToAdd = MAX_MEMBERS_PER_ROOM - 1;
-            const totalEmptySlots = rooms.reduce((acc, room) => acc + (maxMembersToAdd - room.members.length), 0);
+            const totalEmptySlots = rooms.reduce((acc, room) => {
+                const limit = room.isRotten ? 5 : 3;
+                return acc + Math.max(0, limit - room.members.length);
+            }, 0);
             
             if (regulars.length === 0 && totalEmptySlots === 0) {
                 customAlert('매칭할 대기 인원이 없습니다!');
@@ -1162,11 +1162,14 @@
             }
             
             let regularIndex = 0;
+            const maxNewbieRegulars = 3; // 새싹조는 방장제외 3명 (총 4명)
+            const maxRottenRegulars = 5; // 썩은싹조는 방장제외 5명 (총 6명)
+
             // 1. 새싹조를 우선적으로 빈 자리에 랜덤 배정
             const newbieRooms = rooms.filter(r => !r.isRotten);
-            for (let i = 0; i < maxMembersToAdd; i++) {
+            for (let i = 0; i < maxNewbieRegulars; i++) {
                 for (let room of newbieRooms) {
-                    if (regularIndex < shuffled.length && room.members.length < maxMembersToAdd) {
+                    if (regularIndex < shuffled.length && room.members.length < maxNewbieRegulars) {
                         room.members.push(shuffled[regularIndex]);
                         regularIndex++;
                     }
@@ -1175,9 +1178,9 @@
 
             // 2. 남은 인원은 썩은싹조에 배정
             const rottenRooms = rooms.filter(r => r.isRotten);
-            for (let i = 0; i < maxMembersToAdd; i++) {
+            for (let i = 0; i < maxRottenRegulars; i++) {
                 for (let room of rottenRooms) {
-                    if (regularIndex < shuffled.length && room.members.length < maxMembersToAdd) {
+                    if (regularIndex < shuffled.length && room.members.length < maxRottenRegulars) {
                         room.members.push(shuffled[regularIndex]);
                         regularIndex++;
                     }
