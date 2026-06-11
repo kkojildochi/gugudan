@@ -734,6 +734,11 @@
         </div>
     </div>
 
+    <!-- Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="firebase-config.js"></script>
+
     <script>
         const TIE_BREAKER_MAX = 10000;
         let rooms = [];
@@ -896,25 +901,40 @@
         });
         player.addEventListener('ended', nextTrack);
 
-        /* 데이터 및 점수 로직 */
-        function loadData() {
-            const savedRooms = localStorage.getItem('gugudan_rooms');
-            if (savedRooms) rooms = JSON.parse(savedRooms);
+        // Firebase Database 참조
+        const roomsRef = db.ref('gugudan_rooms');
+        const scoresRef = db.ref('gugudan_scores');
 
-            const savedScores = localStorage.getItem('gugudan_scores');
-            if (savedScores) {
-                scores = JSON.parse(savedScores);
+        // 데이터 실시간 수신
+        roomsRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            rooms = data ? Object.values(data) : [];
+            
+            // rooms가 들어왔을 때, scores 구조가 없다면 초기화 방어
+            rooms.forEach(room => {
+                if (!scores.teams[room.id]) scores.teams[room.id] = { bomb: 0 };
+            });
+            
+            renderAll();
+        });
+
+        scoresRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                scores = data;
                 if (!scores.tieBreakers) scores.tieBreakers = { teams: {}, indivs: {} };
             } else {
+                scores = { teams: {}, individuals: {}, tieBreakers: { teams: {}, indivs: {} } };
+                // 점수가 아예 없는 경우 기본 폼 세팅
                 rooms.forEach(room => {
                     if (!scores.teams[room.id]) scores.teams[room.id] = { bomb: 0 };
                 });
-                saveScores();
             }
-        }
+            renderAll();
+        });
 
         function saveScores() {
-            localStorage.setItem('gugudan_scores', JSON.stringify(scores));
+            scoresRef.set(scores);
         }
 
         // 동점자 발생 시 확률(랜덤값)로 등수를 나누기 위한 고유 시드값 반환
@@ -1216,14 +1236,14 @@
 
         function hardReset() {
             customConfirm('모든 데이터를 삭제하고 처음부터 다시 시작하시겠습니까?<br>이 작업은 되돌릴 수 없습니다.', () => {
-                localStorage.clear(); 
+                db.ref('gugudan_rooms').remove();
+                db.ref('gugudan_scores').remove();
+                localStorage.clear();
                 window.location.href = 'group.html';
             });
         }
 
         // 초기화
-        loadData();
-        renderAll();
         initAudio();
     </script>
 </body>
