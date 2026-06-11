@@ -698,7 +698,7 @@
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
-        const db = firebase.database();
+        window.db = firebase.database();
     </script>
 
     <script>
@@ -882,30 +882,8 @@
         });
         player.addEventListener('ended', nextTrack);
 
-        /* 데이터 및 조 편성 로직 */
-        const roomsRef = db.ref('gugudan_rooms');
-        let initialized = false;
-
-        roomsRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            rooms = data ? Object.values(data) : [];
-            
-            // newbies, regulars 동기화 (기존 방에 들어가지 않은 인원 관리)
-            // 현재 구조에서는 대기열을 로컬에만 유지하거나, 같이 DB에 올려야 합니다.
-            // 일단 기존 코드처럼 대기열은 로컬/메모리 유지, 조 편성 결과만 DB에 올리도록 구현
-            renderWaitingPool();
-            renderRooms();
-            if(!initialized) {
-                initialized = true;
-            }
-        });
-
-        function saveRooms() {
-            const roomsObj = {};
-            rooms.forEach((r, idx) => roomsObj[idx] = r);
-            roomsRef.set(roomsObj);
-            
-            // 대기열 로컬 저장 유지 (어드민용)
+        // 로컬 스토리지 데이터 관리 (대기열만 유지)
+        function saveLocalQueues() {
             localStorage.setItem('gugudan_newbies', JSON.stringify(newbies));
             localStorage.setItem('gugudan_regulars', JSON.stringify(regulars));
         }
@@ -915,6 +893,33 @@
             const savedRegulars = localStorage.getItem('gugudan_regulars');
             if (savedNewbies) newbies = JSON.parse(savedNewbies);
             if (savedRegulars) regulars = JSON.parse(savedRegulars);
+        }
+
+        /* Firebase 연동 로직 (방어 코드 포함) */
+        const roomsRef = window.db.ref('gugudan_rooms');
+        let initialized = false;
+
+        function normalizeRooms(data) {
+            if (!data) return [];
+            let rawRooms = Array.isArray(data) ? data : Object.values(data);
+            return rawRooms.filter(r => r !== null && r !== undefined).map(r => {
+                if (!r.members) r.members = [];
+                return r;
+            });
+        }
+
+        roomsRef.on('value', (snapshot) => {
+            rooms = normalizeRooms(snapshot.val());
+            renderWaitingPool();
+            renderRooms();
+            if (!initialized) initialized = true;
+        });
+
+        function saveRooms() {
+            const roomsObj = {};
+            rooms.forEach((r, idx) => roomsObj[idx] = r);
+            roomsRef.set(roomsObj);
+            saveLocalQueues();
         }
 
         function handleEnter(e, type) {
@@ -941,6 +946,7 @@
                 regulars.push(name);
                 nameInput.value = '';
                 nameInput.focus();
+                saveLocalQueues();
                 renderWaitingPool();
                 return;
             }
@@ -992,11 +998,13 @@
             regulars.push(name);
             input.value = '';
             input.focus();
+            saveLocalQueues();
             renderWaitingPool();
         }
 
         function removeRegular(name) {
             regulars = regulars.filter(r => r !== name);
+            saveLocalQueues();
             renderWaitingPool();
         }
 
@@ -1033,6 +1041,9 @@
                 newbies = [];
                 regulars = [];
                 rooms = [];
+                
+                window.db.ref('gugudan_rooms').remove();
+                window.db.ref('gugudan_scores').remove();
                 
                 localStorage.clear(); 
                 renderWaitingPool();
