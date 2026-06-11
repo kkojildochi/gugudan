@@ -584,7 +584,7 @@
         <!-- 상단 입력 섹션 -->
         <div class="input-section glass">
             <div class="input-group">
-                <h2>새싹/썩은싹 등록 (방장, 최대 4개 조)</h2>
+                <h2>새싹/썩은싹 등록 (방장, 최대 5개 조)</h2>
                 <div class="input-row">
                     <!-- 클릭해서 조 이름 변경 기능 유지 -->
                     <input type="text" id="newbie-input" placeholder="방장 닉네임 입력" onkeypress="handleEnter(event, 'newbie')">
@@ -702,14 +702,14 @@
     </script>
 
     <script>
-        const MAX_REGULAR_MEMBERS = 3; 
+        const MAX_REGULAR_MEMBERS = 5; 
 
         let newbies = [];
         let regulars = [];
         let rooms = []; 
         
-        const MAX_ROOMS = 4;
-        const MAX_MEMBERS_PER_ROOM = 4; // 1방장 + 3조원
+        const MAX_ROOMS = 5;
+        const MAX_MEMBERS_PER_ROOM = 6; // 1방장 + 5조원
 
         /* 커스텀 모달 기능 */
         let confirmCallback = null;
@@ -941,8 +941,21 @@
                 return;
             }
             
-            if (rooms.length >= MAX_ROOMS) {
-                customAlert('최대 4개 조까지만 생성 가능합니다.<br>일반조원으로 추가됩니다.');
+            const newbieRooms = rooms.filter(r => !r.isRotten);
+            const rottenRooms = rooms.filter(r => r.isRotten);
+
+            if (!isRotten && newbieRooms.length >= 4) {
+                customAlert('새싹조는 최대 4개까지만 생성 가능합니다.<br>일반조원으로 추가됩니다.');
+                regulars.push(name);
+                nameInput.value = '';
+                nameInput.focus();
+                saveLocalQueues();
+                renderWaitingPool();
+                return;
+            }
+
+            if (isRotten && rottenRooms.length >= 1) {
+                customAlert('썩은싹조는 최대 1개까지만 생성 가능합니다.<br>일반조원으로 추가됩니다.');
                 regulars.push(name);
                 nameInput.value = '';
                 nameInput.focus();
@@ -1078,7 +1091,7 @@
             if (rooms.length === 0) {
                 container.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; color: rgba(255,255,255,0.4); padding: 4rem; background: var(--panel-bg); border-radius: 20px; border: 1px dashed rgba(34, 197, 94, 0.3);">
-                        방장을 등록하면 최대 4개까지 조가 생성됩니다.<br>(새싹조 / 썩은싹조 생성 가능)
+                        방장을 등록하면 최대 5개까지 조가 생성됩니다.<br>(새싹조 4개 / 썩은싹조 1개 생성 가능)
                     </div>`;
                 return;
             }
@@ -1149,22 +1162,28 @@
             }
             
             let regularIndex = 0;
-            let keepMatching = true;
-            
-            while (keepMatching && regularIndex < shuffled.length) {
-                let addedInRound = false;
-                for (let room of rooms) {
-                    if (room.members.length < maxMembersToAdd && regularIndex < shuffled.length) {
+            // 1. 새싹조를 우선적으로 빈 자리에 랜덤 배정
+            const newbieRooms = rooms.filter(r => !r.isRotten);
+            for (let i = 0; i < maxMembersToAdd; i++) {
+                for (let room of newbieRooms) {
+                    if (regularIndex < shuffled.length && room.members.length < maxMembersToAdd) {
                         room.members.push(shuffled[regularIndex]);
                         regularIndex++;
-                        addedInRound = true;
                     }
                 }
-                if (!addedInRound) {
-                    keepMatching = false;
+            }
+
+            // 2. 남은 인원은 썩은싹조에 배정
+            const rottenRooms = rooms.filter(r => r.isRotten);
+            for (let i = 0; i < maxMembersToAdd; i++) {
+                for (let room of rottenRooms) {
+                    if (regularIndex < shuffled.length && room.members.length < maxMembersToAdd) {
+                        room.members.push(shuffled[regularIndex]);
+                        regularIndex++;
+                    }
                 }
             }
-            
+
             regulars = shuffled.slice(regularIndex); // 꽉 차고 남은 인원은 대기열에 보존됨
             
             saveRooms();
