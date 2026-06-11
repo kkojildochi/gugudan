@@ -523,7 +523,23 @@
     <!-- Firebase JS SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="firebase-config.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDP0i8yd2_cd1EpbcVVlfriM4FazDNoJxk",
+            authDomain: "gugudan-7a02e.firebaseapp.com",
+            projectId: "gugudan-7a02e",
+            storageBucket: "gugudan-7a02e.firebasestorage.app",
+            messagingSenderId: "266856469384",
+            appId: "1:266856469384:web:ff982306125bf68e26a03d",
+            measurementId: "G-2JJ3CC5HM4",
+            databaseURL: "https://gugudan-7a02e-default-rtdb.firebaseio.com"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+    </script>
 
     <script>
         /* --- 오디오 플레이어 제어 로직 --- */
