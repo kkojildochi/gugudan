@@ -680,6 +680,11 @@
         </div>
     </div>
 
+    <!-- Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="firebase-config.js"></script>
+
     <script>
         const MAX_REGULAR_MEMBERS = 3; 
 
@@ -861,19 +866,37 @@
         });
         player.addEventListener('ended', nextTrack);
 
-        // 로컬 스토리지 데이터 관리
-        function saveData() {
-            localStorage.setItem('gugudan_rooms', JSON.stringify(rooms));
+        /* 데이터 및 조 편성 로직 */
+        const roomsRef = db.ref('gugudan_rooms');
+        let initialized = false;
+
+        roomsRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            rooms = data ? Object.values(data) : [];
+            
+            // newbies, regulars 동기화 (기존 방에 들어가지 않은 인원 관리)
+            // 현재 구조에서는 대기열을 로컬에만 유지하거나, 같이 DB에 올려야 합니다.
+            // 일단 기존 코드처럼 대기열은 로컬/메모리 유지, 조 편성 결과만 DB에 올리도록 구현
+            renderWaitingPool();
+            renderRooms();
+            if(!initialized) {
+                initialized = true;
+            }
+        });
+
+        function saveRooms() {
+            const roomsObj = {};
+            rooms.forEach((r, idx) => roomsObj[idx] = r);
+            roomsRef.set(roomsObj);
+            
+            // 대기열 로컬 저장 유지 (어드민용)
             localStorage.setItem('gugudan_newbies', JSON.stringify(newbies));
             localStorage.setItem('gugudan_regulars', JSON.stringify(regulars));
         }
 
-        function loadData() {
-            const savedRooms = localStorage.getItem('gugudan_rooms');
+        function loadLocalQueues() {
             const savedNewbies = localStorage.getItem('gugudan_newbies');
             const savedRegulars = localStorage.getItem('gugudan_regulars');
-            
-            if (savedRooms) rooms = JSON.parse(savedRooms);
             if (savedNewbies) newbies = JSON.parse(savedNewbies);
             if (savedRegulars) regulars = JSON.parse(savedRegulars);
         }
@@ -902,7 +925,6 @@
                 regulars.push(name);
                 nameInput.value = '';
                 nameInput.focus();
-                saveData();
                 renderWaitingPool();
                 return;
             }
@@ -918,18 +940,17 @@
             
             nameInput.value = '';
             nameInput.focus();
-            saveData();
+            saveRooms();
             renderRooms();
         }
 
         function editRoomName(roomId, currentName) {
-            customPrompt('새로운 조 이름을 입력하세요.', currentName, (newName) => {
-                if (newName) {
-                    const room = rooms.find(r => r.id === roomId);
-                    if (room) {
-                        room.roomName = newName;
-                        saveData();
-                        renderRooms();
+            customPrompt('새로운 조 이름을 입력하세요:', currentName, (newName) => {
+                if (newName && newName !== currentName) {
+                    const target = rooms.find(r => r.id == roomId);
+                    if (target) {
+                        target.roomName = newName;
+                        saveRooms();
                     }
                 }
             });
@@ -955,13 +976,11 @@
             regulars.push(name);
             input.value = '';
             input.focus();
-            saveData();
             renderWaitingPool();
         }
 
         function removeRegular(name) {
             regulars = regulars.filter(r => r !== name);
-            saveData();
             renderWaitingPool();
         }
 
@@ -975,7 +994,7 @@
                     rooms.splice(roomIndex, 1);
                 }
                 
-                saveData();
+                saveRooms();
                 renderWaitingPool();
                 renderRooms();
             });
@@ -987,7 +1006,7 @@
                     regulars.push(...room.members);
                     room.members = [];
                 });
-                saveData();
+                saveRooms();
                 renderWaitingPool();
                 renderRooms();
             });
@@ -1121,7 +1140,7 @@
             
             regulars = shuffled.slice(regularIndex); // 꽉 차고 남은 인원은 대기열에 보존됨
             
-            saveData();
+            saveRooms();
             renderWaitingPool();
             renderRooms();
             
@@ -1131,10 +1150,10 @@
         }
 
         // 초기화
-        loadData();
+        loadLocalQueues();
         renderWaitingPool();
-        renderRooms();
         initAudio();
     </script>
 </body>
 </html>
+
