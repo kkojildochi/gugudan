@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>구구단 새싹 운동회 - 종합 현황판</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #22c55e;
+            --secondary: #10b981;
+            --accent1: #15803d;
+            --accent2: #047857;
+            --success: #34d399;
+            --danger: #ef4444;
+            --bg-color: #050505;
+            --panel-bg: rgba(15, 20, 15, 0.75);
+            --panel-border: rgba(34, 197, 94, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+        *::-webkit-scrollbar {
+            display: none; /* Chrome, Safari */
+        }
+
+        html, body {
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: #fff;
+            overflow-x: hidden;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+        html::-webkit-scrollbar, body::-webkit-scrollbar {
+            display: none; /* Chrome, Safari */
+        }
+
+        /* 백그라운드 슬라이더 */
+        .bg-slider {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            background-size: cover;
+            background-position: center;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .glass {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 3rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: transparent;
+            border-bottom: none;
+        }
+
+        .logo-img {
+            height: 50px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+        }
+
+        .nav-button {
+            text-decoration: none;
+            color: #fff;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        .nav-button:hover {
+            background: rgba(34, 197, 94, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 1rem auto 3rem;
+            padding: 0 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* 랭킹 보드 레이아웃 */
+        .boards-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .boards-section { grid-template-columns: 1fr; }
+        }
+
+        .board {
+            border-radius: 24px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: relative;
+        }
+
+        .board-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(34, 197, 94, 0.3);
+            padding-bottom: 1rem;
+        }
+
+        .board-header h2 {
+            font-size: 1.4rem;
+            color: #a7f3d0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-btn {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--primary);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover {
+            background: var(--primary);
+            color: #000;
+            transform: scale(1.1);
+        }
+
+        .ranking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .rank-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .rank-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .rank-1 { border-left-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
+        .rank-2 { border-left-color: #94a3b8; }
+        .rank-3 { border-left-color: #b45309; }
+
+        .rank-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .rank-badge {
+            width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
+        }
+
+        /* 모바일 반응형 처리 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .navbar > div { flex-wrap: wrap; justify-content: center; }
+            .container { padding: 0 1rem; margin-bottom: 2rem; }
+            .input-section { padding: 1.5rem; }
+            .input-grid { grid-template-columns: 1fr; }
+            .controls { flex-direction: column; }
+            .room-score-card { padding: 1rem; }
+            .score-inputs { flex-direction: column; }
+            .modal-box { width: 95%; padding: 1.5rem; }
+            .result-item { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+        }
+
+        .score-val {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        /* 조별 정보창 */
+        .rooms-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            align-items: stretch;
+        }
+
+        .room {
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            min-height: 100%;
+            position: relative;
+        }
+
+        .room.rotten-room {
+            border-color: rgba(202, 138, 4, 0.3);
+        }
+        .room.rotten-room::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #ca8a04, #713f12);
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1rem;
+        }
+
+        .room-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .room.rotten-room .room-title {
+            color: #fef08a;
+        }
+
+        .room-members {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            flex: 1;
+        }
+
+        .member {
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 3px solid rgba(255,255,255,0.2);
+        }
+
+        .member.newbie { border-left-color: var(--primary); }
+        .member.rotten { border-left-color: #ca8a04; }
+        .member.regular { border-left-color: var(--secondary); }
+        .room.rotten-room .member.regular { border-left-color: #854d0e; }
+
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .member-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .score-badge {
+            background: rgba(0,0,0,0.3);
+            padding: 0.2rem 0.6rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            color: #a7f3d0;
+        }
+
+        /* 모달창 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            width: 90%;
+            max-width: 400px;
+            padding: 2.5rem;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-content h3 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 1.4rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .form-group input {
+            padding: 1rem;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #fff;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-save { background: var(--primary); color: #000; }
+        .btn-save:hover { background: var(--success); }
+        .btn-cancel { background: rgba(255,255,255,0.1); color: #fff; }
+        .btn-cancel:hover { background: rgba(255,255,255,0.2); }
+
+        /* 하단 오디오 및 리셋 버튼 */
+        .bottom-section {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .reset-actions {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .primary-result-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #000;
+            border: none;
+            font-size: 1.3rem;
+            font-weight: 700;
+            padding: 1.2rem 3rem;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.3);
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 1rem;
+        }
+        .primary-result-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4); }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #fff;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .reset-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4); }
+
+        .hard-reset-btn { 
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+        }
+        .hard-reset-btn:hover { box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4); }
+
+        .mvp-crown {
+            color: #fbbf24;
+            font-size: 1.2rem;
+            margin-left: 0.5rem;
+            filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.5));
+            animation: bounce 2s infinite;
+        }
+
+        /* 커스텀 얼럿 UI 정리 */
+        .custom-alert-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .custom-alert-overlay.active { display: flex; }
+        .custom-alert-box {
+            background: rgba(20, 25, 20, 0.95);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 360px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .custom-alert-box.no-anim { animation: none; }
+        
+        .custom-alert-box p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.5rem;
+            word-break: keep-all;
+        }
+        
+        .custom-alert-box h3 {
+            font-size: 1.2rem;
+            letter-spacing: -0.01em;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .custom-alert-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .custom-alert-buttons button {
+            padding: 0.7rem 1.5rem !important;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        
+        .primary-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .primary-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
+
+        /* 오디오 플레이어 UI */
+        .audio-container {
+            padding: 1.5rem 2.5rem; border-radius: 24px;
+            display: flex; align-items: center; justify-content: space-between; gap: 2rem;
+            background: rgba(20, 25, 20, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+        .track-info {
+            font-size: 1.1rem; font-weight: 600; color: #a7f3d0; letter-spacing: 1px;
+            min-width: 100px; text-align: center;
+        }
+        .modern-audio-player {
+            display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex: 1;
+        }
+        .audio-ctrl-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; width: 44px; height: 44px; border-radius: 50%;
+            cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+        }
+        .audio-ctrl-btn:hover {
+            background: rgba(34, 197, 94, 0.2); color: var(--primary); border-color: rgba(34, 197, 94, 0.4); transform: translateY(-2px);
+        }
+        .audio-play-btn {
+            width: 54px; height: 54px; font-size: 1.4rem; background: var(--primary); color: #000; border: none;
+        }
+        .audio-play-btn:hover {
+            background: var(--success); color: #000; transform: scale(1.05); border: none;
+        }
+        .volume-control {
+            display: flex; align-items: center; gap: 0.8rem; min-width: 120px; color: #94a3b8;
+        }
+        .volume-control input[type="range"] {
+            width: 80px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px;
+            appearance: none; outline: none; padding: 0; border: none;
+        }
+        .volume-control input[type="range"]::-webkit-slider-thumb {
+            appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--primary); cursor: pointer;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <img src="rogo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+        <div style="display: flex; gap: 1rem;">
+            <a href="index.html" class="nav-button" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); margin-left: 0;">🏠 메인 홈</a>
+            <a href="group.html" class="nav-button" style="margin-left: 0;">조 편성하기 ⚙️</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 랭킹 보드 섹션 -->
+        <div class="boards-section">
+            <!-- 팀전 현황판 -->
+            <div class="board glass">
+                <div class="board-header">
+                    <h2>🏆 팀전 현황판</h2>
+                </div>
+                <div class="ranking-list" id="team-ranking-list">
+                    <!-- JS 렌더링 -->
+                </div>
+            </div>
+
+            <!-- 개인전 현황판 -->
+            <div class="board glass">
+                <div class="board-header">
+                    <h2>🏅 개인전 현황판</h2>
+                </div>
+                <div class="ranking-list" id="indiv-ranking-list">
+                    <!-- JS 렌더링 -->
+                </div>
+            </div>
+        </div>
+
+        <h2 style="color: #a7f3d0; margin-top: 1rem; font-size: 1.4rem;">👥 조별 정보 및 개인 점수 입력</h2>
+
+        <!-- 조별 정보창 -->
+        <div class="rooms-container" id="rooms-container">
+            <!-- JS 렌더링 -->
+        </div>
+
+        <!-- 하단 섹션 (오디오 & 리셋) -->
+        <div class="bottom-section">
+            <div class="audio-container glass">
+                <div class="track-info" id="track-display">Track 1</div>
+                <div class="modern-audio-player">
+                    <button class="audio-ctrl-btn" onclick="prevTrack()" title="이전 곡">❮</button>
+                    <button class="audio-ctrl-btn audio-play-btn" id="play-pause-btn" onclick="togglePlay()" title="재생/일시정지">▶</button>
+                    <button class="audio-ctrl-btn" onclick="nextTrack()" title="다음 곡">❯</button>
+                </div>
+                <div class="volume-control">
+                    <span style="font-size: 1.1rem;">🔊</span>
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.5" oninput="changeVolume()">
+                </div>
+                <audio id="bgm-player" style="display:none;"></audio>
+            </div>
+
+            <div style="display: flex; flex-direction: column; align-items: center; margin-top: 1rem;">
+                <!-- 결산하기 버튼 -->
+                <button onclick="showResults()" class="primary-result-btn">🎉 결산하기</button>
+                
+                <!-- 리셋 버튼들 -->
+                <div class="reset-actions">
+                    <button onclick="resetScores()" class="reset-btn">점수 초기화</button>
+                    <button onclick="hardReset()" class="reset-btn hard-reset-btn">완전 초기화 (조편성 포함)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 팀전 점수 입력 모달 -->
+    <div id="teamModal" class="modal">
+        <div class="modal-content glass" style="max-width: 360px;">
+            <h3 style="font-size: 1.2rem; color: var(--primary);">팀전 점수 입력</h3>
+            <div style="text-align: center; font-weight: 700; color: #a7f3d0; margin-bottom: 0.5rem;" id="team-name-display"></div>
+            <input type="hidden" id="team-id">
+            <div class="form-group">
+                <label>👀 눈치폭탄 점수</label>
+                <input type="number" id="bomb-score" value="0">
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn btn-save" onclick="saveTeamScore()">저장</button>
+                <button class="modal-btn btn-cancel" onclick="closeModal('teamModal')">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 개인전 점수 입력 모달 -->
+    <div id="indivModal" class="modal">
+        <div class="modal-content glass" style="max-width: 360px;">
+            <h3 style="font-size: 1.2rem; color: var(--primary);">개인전 점수 입력</h3>
+            <div style="text-align: center; font-weight: 700; color: #a7f3d0; margin-bottom: 0.5rem;" id="indiv-name-display"></div>
+            <input type="hidden" id="indiv-name">
+            <div class="form-group">
+                <label>🐷 꽃돼지 대소동 점수</label>
+                <input type="number" id="pig-score" value="0">
+            </div>
+            <!-- 컬러 매치 개인전으로 이동 (100점당 1점) -->
+            <div class="form-group">
+                <label>🎨 컬러 매치 점수 (100점당 1점 환산)</label>
+                <input type="number" id="color-score" value="0" placeholder="예: 1500 (15점으로 환산됨)">
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn btn-save" onclick="saveIndivScore()">저장</button>
+                <button class="modal-btn btn-cancel" onclick="closeModal('indivModal')">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 결산 결과 모달 -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content glass" style="max-width: 500px; text-align: center; padding: 3rem 2rem;">
+            <h2 style="font-size: 2.2rem; color: #fbbf24; margin-bottom: 0.5rem; text-shadow: 0 0 15px rgba(251,191,36,0.5);">🎉 축하합니다! 🎉</h2>
+            <p style="color: #a7f3d0; margin-bottom: 2rem;">운동회 일정이 모두 종료되었습니다. 최종 결과를 발표합니다!</p>
+
+            <div style="background: rgba(255,255,255,0.05); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                <h3 style="color: var(--success); font-size: 1.2rem; margin-bottom: 1rem;">🏆 최종 우승 팀</h3>
+                <div id="result-best-team" style="font-size: 1.6rem; font-weight: 700; color: #fff;"></div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.05); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                <h3 style="color: #60a5fa; font-size: 1.2rem; margin-bottom: 1rem;">🏅 개인전 TOP 3</h3>
+                <div id="result-top-indivs" style="display: flex; flex-direction: column; gap: 0.8rem; font-size: 1.3rem; color: #fff; font-weight: 600;">
+                    <!-- JS injected -->
+                </div>
+            </div>
+
+            <div style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(217, 119, 6, 0.2) 100%); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 16px; padding: 2rem;">
+                <h3 style="color: #fbbf24; font-size: 1.4rem; margin-bottom: 1rem;">👑 최종 MVP 👑</h3>
+                <div id="result-mvp" style="font-size: 2.2rem; font-weight: 800; color: #fff; text-shadow: 0 0 20px rgba(251,191,36,0.8);"></div>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 2rem;">
+                <button class="modal-btn btn-cancel" onclick="closeModal('resultModal')" style="font-size: 1.1rem; padding: 1.2rem; background: rgba(255,255,255,0.2);">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alerts -->
+    <div id="customAlertOverlay" class="custom-alert-overlay">
+        <div class="custom-alert-box glass">
+            <p id="customAlertMsg"></p>
+            <div class="custom-alert-buttons">
+                <button class="primary-btn" onclick="closeCustomAlert()">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="customConfirmOverlay" class="custom-alert-overlay">
+        <div class="custom-alert-box glass">
+            <p id="customConfirmMsg"></p>
+            <div class="custom-alert-buttons">
+                <button class="primary-btn" id="customConfirmYes">확인</button>
+                <button class="reset-btn" onclick="closeCustomConfirm()">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="consentOverlay" class="custom-alert-overlay">
+        <div class="custom-alert-box glass no-anim">
+            <p>이 페이지에는 뮤직 플레이어가 포함되어있습니다.<br>재생에 동의 하십니까?</p>
+            <div class="custom-alert-buttons">
+                <button class="primary-btn" onclick="acceptConsent(true)">동의</button>
+                <button class="reset-btn" onclick="acceptConsent(false)">동의 안함</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TIE_BREAKER_MAX = 10000;
+        let rooms = [];
+        let scores = {
+            teams: {}, 
+            individuals: {},
+            tieBreakers: { teams: {}, indivs: {} }
+        };
+        let mvpName = null; 
+
+
+
+        /* 커스텀 모달 기능 */
+        let confirmCallback = null;
+
+        function customAlert(msg) {
+            document.getElementById('customAlertMsg').innerHTML = msg;
+            document.getElementById('customAlertOverlay').classList.add('active');
+        }
+        function closeCustomAlert() {
+            document.getElementById('customAlertOverlay').classList.remove('active');
+        }
+
+        function customConfirm(msg, callback) {
+            document.getElementById('customConfirmMsg').innerHTML = msg;
+            confirmCallback = callback;
+            document.getElementById('customConfirmOverlay').classList.add('active');
+        }
+        function closeCustomConfirm() {
+            document.getElementById('customConfirmOverlay').classList.remove('active');
+            confirmCallback = null;
+        }
+        document.getElementById('customConfirmYes').addEventListener('click', () => {
+            document.getElementById('customConfirmOverlay').classList.remove('active');
+            if (confirmCallback) confirmCallback();
+            confirmCallback = null;
+        });
+
+        /* 오디오 플레이어 기능 */
+        const tracks = ['s1.mp3', 's2.mp3', 's3.mp3', 's4.mp3', 's5.mp3', 's6.mp3', 's7.mp3'];
+        let currentTrackIndex = 0;
+        const player = document.getElementById('bgm-player');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const trackDisplay = document.getElementById('track-display');
+        const volumeSlider = document.getElementById('volume-slider');
+
+        function initAudio() {
+            const consent = localStorage.getItem('gugudan_audio_consent');
+            if (!consent) {
+                document.getElementById('consentOverlay').classList.add('active');
+            } else {
+                loadAudioState();
+            }
+        }
+
+        function acceptConsent(allow) {
+            document.getElementById('consentOverlay').classList.remove('active');
+            localStorage.setItem('gugudan_audio_consent', allow ? 'true' : 'false');
+            if (allow) {
+                currentTrackIndex = 0;
+                player.src = tracks[currentTrackIndex];
+                player.volume = volumeSlider.value;
+                playTrack();
+            } else {
+                loadAudioState(false);
+            }
+        }
+
+        function loadAudioState(autoPlay = true) {
+            const consent = localStorage.getItem('gugudan_audio_consent');
+            if (consent === 'false') autoPlay = false;
+
+            const stateStr = localStorage.getItem('gugudan_audio_state');
+            if (stateStr) {
+                const state = JSON.parse(stateStr);
+                currentTrackIndex = state.trackIndex || 0;
+                player.src = tracks[currentTrackIndex];
+                
+                player.volume = state.volume !== undefined ? state.volume : 0.5;
+                volumeSlider.value = player.volume;
+
+                player.addEventListener('loadedmetadata', function onMeta() {
+                    player.currentTime = state.currentTime || 0;
+                    player.removeEventListener('loadedmetadata', onMeta);
+                });
+                
+                updateTrackDisplay();
+                
+                if (state.isPlaying && autoPlay) {
+                    player.play().then(() => {
+                        playPauseBtn.innerText = '⏸';
+                    }).catch(e => {
+                        console.log('Auto-play blocked');
+                        playPauseBtn.innerText = '▶';
+                    });
+                } else {
+                    playPauseBtn.innerText = '▶';
+                }
+            } else {
+                player.src = tracks[0];
+                player.volume = 0.5;
+                volumeSlider.value = 0.5;
+                updateTrackDisplay();
+            }
+        }
+
+        function saveAudioState() {
+            const state = {
+                trackIndex: currentTrackIndex,
+                currentTime: player.currentTime,
+                isPlaying: !player.paused,
+                volume: player.volume
+            };
+            localStorage.setItem('gugudan_audio_state', JSON.stringify(state));
+        }
+
+        function togglePlay() {
+            if (player.paused) {
+                player.play();
+                playPauseBtn.innerText = '⏸';
+            } else {
+                player.pause();
+                playPauseBtn.innerText = '▶';
+            }
+            saveAudioState();
+        }
+
+        function playTrack() {
+            player.src = tracks[currentTrackIndex];
+            player.play().then(() => {
+                playPauseBtn.innerText = '⏸';
+            }).catch(e => console.log('Auto-play blocked'));
+            updateTrackDisplay();
+            saveAudioState();
+        }
+
+        function prevTrack() {
+            currentTrackIndex = (currentTrackIndex - 1 + tracks.length) % tracks.length;
+            playTrack();
+        }
+
+        function nextTrack() {
+            currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+            playTrack();
+        }
+
+        function changeVolume() {
+            player.volume = volumeSlider.value;
+            saveAudioState();
+        }
+
+        function updateTrackDisplay() {
+            trackDisplay.innerText = `Track ${currentTrackIndex + 1}`;
+        }
+
+        player.addEventListener('timeupdate', () => {
+            if (Math.floor(player.currentTime) % 2 === 0) {
+                saveAudioState();
+            }
+        });
+        player.addEventListener('ended', nextTrack);
+
+        /* 데이터 및 점수 로직 */
+        function loadData() {
+            const savedRooms = localStorage.getItem('gugudan_rooms');
+            if (savedRooms) rooms = JSON.parse(savedRooms);
+
+            const savedScores = localStorage.getItem('gugudan_scores');
+            if (savedScores) {
+                scores = JSON.parse(savedScores);
+                if (!scores.tieBreakers) scores.tieBreakers = { teams: {}, indivs: {} };
+            } else {
+                rooms.forEach(room => {
+                    if (!scores.teams[room.id]) scores.teams[room.id] = { bomb: 0 };
+                });
+                saveScores();
+            }
+        }
+
+        function saveScores() {
+            localStorage.setItem('gugudan_scores', JSON.stringify(scores));
+        }
+
+        // 동점자 발생 시 확률(랜덤값)로 등수를 나누기 위한 고유 시드값 반환
+        function getTieBreaker(type, id) {
+            if (type === 'team') {
+                if (scores.tieBreakers.teams[id] === undefined) {
+                    scores.tieBreakers.teams[id] = Math.random();
+                    saveScores();
+                }
+                return scores.tieBreakers.teams[id];
+            } else {
+                if (scores.tieBreakers.indivs[id] === undefined) {
+                    scores.tieBreakers.indivs[id] = Math.random();
+                    saveScores();
+                }
+                return scores.tieBreakers.indivs[id];
+            }
+        }
+
+        function getTeamTotal(roomId) {
+            const ts = scores.teams[roomId];
+            return ts ? (parseInt(ts.bomb) || 0) : 0;
+        }
+
+        function getIndivTotal(name) {
+            const is = scores.individuals[name];
+            if (!is) return 0;
+            
+            const pig = parseInt(is.pig) || 0;
+            const colorRaw = parseInt(is.color_raw) || 0;
+            const colorPoints = Math.floor(colorRaw / 100);
+            
+            return pig + colorPoints;
+        }
+
+        function calculateMVP() {
+            let candidates = [];
+
+            rooms.forEach(room => {
+                const teamScore = getTeamTotal(room.id);
+                const members = [room.newbie, ...room.members];
+                
+                members.forEach(member => {
+                    if (!member) return;
+                    const indivScore = getIndivTotal(member);
+                    const totalScore = teamScore + indivScore;
+
+                    candidates.push({ name: member, score: totalScore });
+                });
+            });
+
+            // 점수 내림차순, 동점일 경우 tieBreaker를 이용하여 랜덤 단일 1등 결정
+            candidates.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return getTieBreaker('indiv', b.name) - getTieBreaker('indiv', a.name);
+            });
+
+            mvpName = candidates.length > 0 && candidates[0].score > 0 ? candidates[0].name : null;
+        }
+
+        function renderAll() {
+            calculateMVP();
+            renderTeamRanking();
+            renderIndivRanking();
+            renderRooms();
+        }
+
+        function getRankedTeams() {
+            return rooms.map((room, index) => {
+                const roomName = room.roomName || `${index + 1}조`;
+                return {
+                    id: room.id,
+                    name: roomName,
+                    score: getTeamTotal(room.id)
+                };
+            }).sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return getTieBreaker('team', b.id) - getTieBreaker('team', a.id);
+            });
+        }
+
+        function getRankedIndivs() {
+            let allMembers = [];
+            rooms.forEach(room => {
+                if(room.newbie) allMembers.push(room.newbie);
+                room.members.forEach(m => { if(m) allMembers.push(m); });
+            });
+
+            return allMembers.map(name => {
+                return { name, score: getIndivTotal(name) };
+            }).sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return getTieBreaker('indiv', b.name) - getTieBreaker('indiv', a.name);
+            });
+        }
+
+        function renderTeamRanking() {
+            const list = document.getElementById('team-ranking-list');
+            if (rooms.length === 0) {
+                list.innerHTML = '<div style="color: gray; text-align: center;">편성된 조가 없습니다.</div>';
+                return;
+            }
+
+            const rankedTeams = getRankedTeams();
+
+            list.innerHTML = rankedTeams.map((team, idx) => `
+                <div class="rank-item rank-${idx + 1}">
+                    <div class="rank-info">
+                        <div class="rank-badge">${idx + 1}</div>
+                        <div style="font-weight: 600;">${team.name}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.8rem;">
+                        <div class="score-val">${team.score}점</div>
+                        <button class="add-btn" style="width:32px; height:32px; font-size:1.1rem;" onclick="openTeamModal(${team.id}, '${team.name}')" title="팀 점수 입력">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderIndivRanking() {
+            const list = document.getElementById('indiv-ranking-list');
+            const rankedIndivs = getRankedIndivs();
+
+            if (rankedIndivs.length === 0) {
+                list.innerHTML = '<div style="color: gray; text-align: center;">등록된 인원이 없습니다.</div>';
+                return;
+            }
+
+            const topIndivs = rankedIndivs.slice(0, 5);
+
+            if (topIndivs[0].score === 0) {
+                 list.innerHTML = '<div style="color: gray; text-align: center;">아직 등록된 개인 점수가 없습니다.</div>';
+                 return;
+            }
+
+            list.innerHTML = topIndivs.map((indiv, idx) => `
+                <div class="rank-item rank-${idx + 1}">
+                    <div class="rank-info">
+                        <div class="rank-badge">${idx + 1}</div>
+                        <div style="font-weight: 600;">${indiv.name}</div>
+                    </div>
+                    <div class="score-val">${indiv.score}점</div>
+                </div>
+            `).join('');
+        }
+
+        function renderRooms() {
+            const container = document.getElementById('rooms-container');
+            
+            if (rooms.length === 0) {
+                container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: rgba(255,255,255,0.4); padding: 4rem; background: var(--panel-bg); border-radius: 20px;">먼저 조를 편성해주세요.</div>`;
+                return;
+            }
+
+            container.innerHTML = rooms.map((room, index) => {
+                const teamScore = getTeamTotal(room.id);
+                const roomName = room.roomName || `${index + 1}조`;
+                const roomClass = room.isRotten ? 'rotten-room' : '';
+                const allMembers = [
+                    { name: room.newbie, type: room.isRotten ? 'rotten' : 'newbie', icon: room.isRotten ? '🥀' : '🌱' },
+                    ...room.members.map(m => ({ name: m, type: 'regular', icon: '👤' }))
+                ];
+
+                return `
+                <div class="room glass ${roomClass}">
+                    <div class="room-header">
+                        <div class="room-title">
+                            ${roomName}
+                        </div>
+                        <div style="color: var(--success); font-weight: 700;">팀: ${teamScore}점</div>
+                    </div>
+                    <div class="room-members">
+                        ${allMembers.map(m => {
+                            if (!m.name) return '';
+                            const isMVP = (mvpName === m.name);
+                            const iScore = getIndivTotal(m.name);
+                            return `
+                            <div class="member ${m.type}">
+                                <div class="member-info">
+                                    <span class="member-icon">${m.icon}</span>
+                                    <span style="${m.type !== 'regular' ? 'font-weight: 700;' : ''}">${m.name}</span>
+                                    ${isMVP ? '<span class="mvp-crown" title="현재 MVP!">👑</span>' : ''}
+                                </div>
+                                <div class="member-actions">
+                                    <span class="score-badge">${iScore}점</span>
+                                    <button class="add-btn" style="width:28px; height:28px; font-size:1rem;" onclick="openIndivModal('${m.name}')" title="개인 점수 입력">+</button>
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // 팀전 모달
+        function openTeamModal(roomId, roomName) {
+            document.getElementById('team-id').value = roomId;
+            document.getElementById('team-name-display').innerText = roomName;
+            
+            if (scores.teams[roomId]) {
+                document.getElementById('bomb-score').value = scores.teams[roomId].bomb || 0;
+            } else {
+                document.getElementById('bomb-score').value = 0;
+            }
+            
+            document.getElementById('teamModal').classList.add('active');
+        }
+
+        // 개인전 모달
+        function openIndivModal(name) {
+            document.getElementById('indiv-name').value = name;
+            document.getElementById('indiv-name-display').innerText = name;
+            
+            const existingPig = scores.individuals[name] ? scores.individuals[name].pig : 0;
+            const existingColor = scores.individuals[name] ? (scores.individuals[name].color_raw || 0) : 0;
+            
+            document.getElementById('pig-score').value = existingPig || 0;
+            document.getElementById('color-score').value = existingColor || 0;
+            
+            document.getElementById('indivModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function saveTeamScore() {
+            const roomId = document.getElementById('team-id').value;
+            const bomb = parseInt(document.getElementById('bomb-score').value) || 0;
+
+            if (!scores.teams[roomId]) scores.teams[roomId] = {};
+            scores.teams[roomId].bomb = bomb;
+
+            saveScores();
+            closeModal('teamModal');
+            renderAll();
+        }
+
+        function saveIndivScore() {
+            const name = document.getElementById('indiv-name').value;
+            const pig = parseInt(document.getElementById('pig-score').value) || 0;
+            const colorRaw = parseInt(document.getElementById('color-score').value) || 0;
+
+            if (!scores.individuals[name]) scores.individuals[name] = {};
+            scores.individuals[name].pig = pig;
+            scores.individuals[name].color_raw = colorRaw;
+
+            saveScores();
+            closeModal('indivModal');
+            renderAll();
+        }
+
+        // 결산 모달 출력 함수
+        function showResults() {
+            if (rooms.length === 0) {
+                customAlert('조가 편성되지 않았습니다.');
+                return;
+            }
+
+            // 우승 팀 세팅
+            const rankedTeams = getRankedTeams();
+            const topTeam = rankedTeams[0];
+            if (topTeam) {
+                document.getElementById('result-best-team').innerText = `${topTeam.name} (${topTeam.score}점)`;
+            }
+
+            // 개인전 TOP 3 세팅
+            const rankedIndivs = getRankedIndivs();
+            const top3 = rankedIndivs.slice(0, 3);
+            document.getElementById('result-top-indivs').innerHTML = top3.map((indiv, idx) => {
+                let badge = idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉';
+                return `<div>${badge} ${idx + 1}등: ${indiv.name} (${indiv.score}점)</div>`;
+            }).join('');
+
+            // MVP 세팅 (calculateMVP에 의해 결정된 mvpName 사용)
+            let mvpDisplay = '없음';
+            if (mvpName) {
+                // MVP 점수 찾기 (팀점수 + 개인점수)
+                const mvpRoom = rooms.find(r => r.newbie === mvpName || r.members.includes(mvpName));
+                if (mvpRoom) {
+                    const totalScore = getTeamTotal(mvpRoom.id) + getIndivTotal(mvpName);
+                    mvpDisplay = `${mvpName} (${totalScore}점)`;
+                }
+            }
+            document.getElementById('result-mvp').innerText = mvpDisplay;
+
+            document.getElementById('resultModal').classList.add('active');
+        }
+
+        function resetScores() {
+            customConfirm('입력된 모든 팀전 및 개인전 점수를 초기화하시겠습니까?<br>(조 편성은 유지됩니다)', () => {
+                scores = { teams: {}, individuals: {}, tieBreakers: { teams: {}, indivs: {} } };
+                saveScores();
+                renderAll();
+            });
+        }
+
+        function hardReset() {
+            customConfirm('모든 데이터를 삭제하고 처음부터 다시 시작하시겠습니까?<br>이 작업은 되돌릴 수 없습니다.', () => {
+                localStorage.clear(); 
+                window.location.href = 'group.html';
+            });
+        }
+
+        // 초기화
+        loadData();
+        renderAll();
+        initAudio();
+    </script>
+</body>
+</html>

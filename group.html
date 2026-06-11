@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>구구단 새싹 운동회 - 조 편성</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #22c55e;
+            --secondary: #10b981;
+            --accent1: #15803d;
+            --accent2: #047857;
+            --success: #34d399;
+            --danger: #ef4444;
+            --bg-color: #050505;
+            --panel-bg: rgba(15, 20, 15, 0.75);
+            --panel-border: rgba(34, 197, 94, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+        *::-webkit-scrollbar {
+            display: none; /* Chrome, Safari */
+        }
+
+        html, body {
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: #fff;
+            overflow-x: hidden;
+            -ms-overflow-style: none; /* IE and Edge 스크롤바 숨김 */
+            scrollbar-width: none; /* Firefox 스크롤바 숨김 */
+        }
+        html::-webkit-scrollbar, body::-webkit-scrollbar {
+            display: none; /* Chrome, Safari 스크롤바 숨김 */
+        }
+
+        /* 백그라운드 슬라이더 */
+        .bg-slider {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            background-size: cover;
+            background-position: center;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .glass {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 3rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: transparent;
+            border-bottom: none;
+        }
+
+        .logo-img {
+            height: 50px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+        }
+
+        .nav-button {
+            text-decoration: none;
+            color: #fff;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        .nav-button:hover {
+            background: rgba(34, 197, 94, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 1rem auto 3rem;
+            padding: 0 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            border-radius: 24px;
+            padding: 2.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .input-section { grid-template-columns: 1fr; }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .input-group h2 {
+            font-size: 1.2rem;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        input {
+            flex: 1;
+            padding: 1.2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            min-width: 0; /* flex box 버그 방지 */
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        button {
+            cursor: pointer;
+            padding: 1.2rem 1.2rem;
+            border-radius: 12px;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        button:hover { transform: translateY(-2px); }
+        button:active { transform: translateY(1px); }
+
+        .primary-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
+        }
+
+        .rotten-btn {
+            background: linear-gradient(135deg, #a16207 0%, #713f12 100%);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(161, 98, 7, 0.2);
+        }
+        .rotten-btn:hover {
+            background: linear-gradient(135deg, #ca8a04 0%, #854d0e 100%);
+        }
+
+        .secondary-btn {
+            background: linear-gradient(135deg, var(--accent1) 0%, var(--accent2) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(21, 128, 61, 0.2);
+        }
+
+        .actions-row {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .actions-row { grid-template-columns: 1fr; }
+        }
+
+        .match-btn {
+            background: linear-gradient(135deg, var(--success) 0%, var(--primary) 100%);
+            color: #000;
+            font-size: 1.2rem;
+            padding: 1.2rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 1rem;
+            padding: 1.2rem;
+            border-radius: 16px;
+        }
+        .reset-btn:hover { background: rgba(255, 255, 255, 0.2); }
+
+        .hard-reset-btn {
+            background: rgba(220, 38, 38, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(220, 38, 38, 0.3);
+        }
+        .hard-reset-btn:hover { background: rgba(220, 38, 38, 0.3); color: #fff; }
+
+        .waiting-pool {
+            border-radius: 24px;
+            padding: 2rem;
+        }
+
+        .waiting-pool h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            min-height: 50px;
+        }
+
+        .badge {
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-weight: 500;
+        }
+
+        .badge .remove {
+            cursor: pointer;
+            color: #fca5a5;
+            font-size: 1.2rem;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .badge .remove:hover { color: #ef4444; }
+
+        .rooms-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            align-items: stretch;
+        }
+
+        .room {
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            position: relative;
+            overflow: hidden;
+            min-height: 100%;
+        }
+
+        /* 새싹조 기본 테마 */
+        .room::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0.7;
+        }
+        .room.full-room::before {
+            background: linear-gradient(90deg, var(--success), #a7f3d0);
+        }
+
+        /* 썩은싹조 특별 테마 (갈색) */
+        .room.rotten-room::before {
+            background: linear-gradient(90deg, #ca8a04, #713f12);
+        }
+        .room.rotten-room.full-room::before {
+            background: linear-gradient(90deg, #fef08a, #ca8a04);
+        }
+        .room.rotten-room .room-title {
+            color: #fef08a;
+        }
+
+        .room:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            border-color: rgba(34, 197, 94, 0.5);
+        }
+        .room.rotten-room:hover {
+            border-color: rgba(202, 138, 4, 0.5);
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .room-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        
+        .room-title:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .edit-icon {
+            font-size: 0.9rem;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        .room-title:hover .edit-icon { opacity: 1; }
+
+        .room-count {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .full-room .room-count {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--primary);
+        }
+        .full-room.rotten-room .room-count {
+            background: rgba(202, 138, 4, 0.2);
+            color: #fef08a;
+        }
+
+        .room-members {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            flex: 1;
+        }
+
+        .member {
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-weight: 500;
+            border: 1px solid transparent;
+            transition: background 0.3s;
+        }
+
+        .member:hover { background: rgba(255, 255, 255, 0.08); }
+        .member.newbie {
+            background: linear-gradient(90deg, rgba(34, 197, 94, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%);
+            border-left: 3px solid var(--primary);
+        }
+        .member.rotten {
+            background: linear-gradient(90deg, rgba(161, 98, 7, 0.15) 0%, rgba(113, 63, 18, 0.05) 100%);
+            border-left: 3px solid #ca8a04;
+        }
+        .member.regular { border-left: 3px solid var(--accent1); }
+        .room.rotten-room .member.regular { border-left-color: #854d0e; }
+
+        /* 모바일 반응형 처리 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .navbar > div { flex-wrap: wrap; justify-content: center; }
+            .container { padding: 0 1rem; margin-bottom: 2rem; }
+            .input-row { flex-direction: column; }
+            .input-row button { width: 100%; padding: 1rem; }
+            .actions-row { grid-template-columns: 1fr; }
+            .controls { flex-direction: column; align-items: stretch; }
+            .controls input[type="text"] { width: 100%; }
+            .list-section { padding: 1.5rem; }
+            .rooms-container { grid-template-columns: 1fr; }
+            .title-row { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .badge-container { flex-wrap: wrap; }
+        }
+
+        .member.empty {
+            opacity: 0.4;
+            justify-content: center;
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            background: transparent;
+            color: #64748b;
+        }
+
+        /* 커스텀 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 6000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .member-icon {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+        }
+
+        .remove-room {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.2);
+            transition: color 0.2s;
+            font-size: 1.2rem;
+            z-index: 10;
+        }
+
+        .remove-room:hover { color: var(--danger); }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* 커스텀 얼럿 UI 정리 (가독성 향상) */
+        .custom-alert-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .custom-alert-overlay.active { display: flex; }
+        .custom-alert-box {
+            background: rgba(20, 25, 20, 0.95);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 360px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .custom-alert-box.no-anim { animation: none; }
+        
+        .custom-alert-box p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.5rem;
+            word-break: keep-all;
+        }
+        
+        .custom-alert-box h3 {
+            font-size: 1.2rem;
+            letter-spacing: -0.01em;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .custom-alert-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .custom-alert-buttons button {
+            padding: 0.7rem 1.5rem !important;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        /* 오디오 플레이어 UI */
+        .audio-container {
+            margin-top: 2rem; padding: 1.5rem 2.5rem; border-radius: 24px;
+            display: flex; align-items: center; justify-content: space-between; gap: 2rem;
+            background: rgba(20, 25, 20, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+        .track-info {
+            font-size: 1.1rem; font-weight: 600; color: #a7f3d0; letter-spacing: 1px;
+            min-width: 100px; text-align: center;
+        }
+        .modern-audio-player {
+            display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex: 1;
+        }
+        .audio-ctrl-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; width: 44px; height: 44px; border-radius: 50%;
+            cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+        }
+        .audio-ctrl-btn:hover {
+            background: rgba(34, 197, 94, 0.2); color: var(--primary); border-color: rgba(34, 197, 94, 0.4); transform: translateY(-2px);
+        }
+        .audio-play-btn {
+            width: 54px; height: 54px; font-size: 1.4rem; background: var(--primary); color: #000; border: none;
+        }
+        .audio-play-btn:hover {
+            background: var(--success); color: #000; transform: scale(1.05); border: none;
+        }
+        .volume-control {
+            display: flex; align-items: center; gap: 0.8rem; min-width: 120px; color: #94a3b8;
+        }
+        .volume-control input[type="range"] {
+            width: 80px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px;
+            appearance: none; outline: none; padding: 0; border: none;
+        }
+        .volume-control input[type="range"]::-webkit-slider-thumb {
+            appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--primary); cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <img src="rogo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+        <div style="display: flex; gap: 1rem; margin-left: auto;">
+            <a href="index.html" class="nav-button" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3);">🏠 메인 홈</a>
+            <a href="now.html" class="nav-button" style="margin-left: 0;">운동회 📊</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 상단 입력 섹션 -->
+        <div class="input-section glass">
+            <div class="input-group">
+                <h2>새싹/썩은싹 등록 (방장, 최대 4개 조)</h2>
+                <div class="input-row">
+                    <!-- 클릭해서 조 이름 변경 기능 유지 -->
+                    <input type="text" id="newbie-input" placeholder="방장 닉네임 입력" onkeypress="handleEnter(event, 'newbie')">
+                    <button onclick="addNewbie(false)" class="primary-btn">새싹조 생성</button>
+                    <button onclick="addNewbie(true)" class="rotten-btn" title="특별 테마 적용 (갈색)">썩은싹조 생성</button>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <h2>일반조원 등록 (대기열에 추가)</h2>
+                <div class="input-row">
+                    <input type="text" id="regular-input" placeholder="조원 닉네임 입력" onkeypress="handleEnter(event, 'regular')">
+                    <button onclick="addRegular()" class="secondary-btn">등록</button>
+                </div>
+            </div>
+            
+            <div class="actions-row">
+                <button onclick="randomMatch()" class="match-btn">랜덤 매칭 시작!</button>
+                <button onclick="softReset()" class="reset-btn" title="등록된 닉네임은 유지하고 조 편성만 초기화합니다">조편성 초기화</button>
+                <button onclick="hardReset()" class="reset-btn hard-reset-btn" title="브라우저 저장 데이터를 삭제하고 완전히 초기화합니다">완전 초기화</button>
+            </div>
+        </div>
+
+        <!-- 일반조원 대기열 -->
+        <div class="waiting-pool glass">
+            <h2>대기 중인 조원 (<span id="regular-count">0</span>명)</h2>
+            <div id="regular-list" class="badge-container">
+                <div style="color: rgba(255,255,255,0.4); font-size: 0.9rem; margin-top: 0.5rem;">
+                    대기열이 비어있습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- 생성된 방(조) 목록 -->
+        <div class="rooms-container" id="rooms-container">
+            <!-- 자바스크립트로 방이 렌더링 됩니다 -->
+        </div>
+
+        <!-- Audio Player -->
+        <div class="audio-container glass">
+            <div class="track-info" id="track-display">Track 1</div>
+            <div class="modern-audio-player">
+                <button class="audio-ctrl-btn" onclick="prevTrack()" title="이전 곡">❮</button>
+                <button class="audio-ctrl-btn audio-play-btn" id="play-pause-btn" onclick="togglePlay()" title="재생/일시정지">▶</button>
+                <button class="audio-ctrl-btn" onclick="nextTrack()" title="다음 곡">❯</button>
+            </div>
+            <div class="volume-control">
+                <span style="font-size: 1.1rem;">🔊</span>
+                <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.5" oninput="changeVolume()">
+            </div>
+            <audio id="bgm-player" style="display:none;"></audio>
+        </div>
+    </div>
+
+    <!-- Custom Alerts & Prompts -->
+    <div id="customAlertOverlay" class="custom-alert-overlay">
+        <div class="custom-alert-box glass">
+            <p id="customAlertMsg"></p>
+            <div class="custom-alert-buttons">
+                <button class="primary-btn" onclick="closeCustomAlert()">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="customConfirmOverlay" class="custom-alert-overlay">
+        <div class="custom-alert-box glass">
+            <p id="customConfirmMsg"></p>
+            <div class="custom-alert-buttons">
+                <button class="primary-btn" id="customConfirmYes">확인</button>
+                <button class="reset-btn" onclick="closeCustomConfirm()">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="customPromptOverlay" class="custom-alert-overlay">
+        <div class="custom-alert-box glass">
+            <p id="customPromptMsg"></p>
+            <input type="text" id="customPromptInput" style="padding: 0.8rem; border-radius: 8px; width: 100%; border: 1px solid rgba(34, 197, 94, 0.4); background: rgba(0,0,0,0.5); color: #fff; text-align: center; font-size: 1rem;" onkeypress="if(event.key==='Enter') document.getElementById('customPromptYes').click();">
+            <div class="custom-alert-buttons">
+                <button class="primary-btn" id="customPromptYes">확인</button>
+                <button class="reset-btn" onclick="closeCustomPrompt()">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="consentOverlay" class="custom-alert-overlay">
+        <div class="custom-alert-box glass no-anim">
+            <p>이 페이지에는 뮤직 플레이어가 포함되어있습니다.<br>재생에 동의 하십니까?</p>
+            <div class="custom-alert-buttons">
+                <button class="primary-btn" onclick="acceptConsent(true)">동의</button>
+                <button class="reset-btn" onclick="acceptConsent(false)">동의 안함</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MAX_REGULAR_MEMBERS = 3; 
+
+        let newbies = [];
+        let regulars = [];
+        let rooms = []; 
+        
+        const MAX_ROOMS = 4;
+        const MAX_MEMBERS_PER_ROOM = 4; // 1방장 + 3조원
+
+        /* 커스텀 모달 기능 */
+        let confirmCallback = null;
+        let promptCallback = null;
+
+        function customAlert(msg) {
+            document.getElementById('customAlertMsg').innerHTML = msg;
+            document.getElementById('customAlertOverlay').classList.add('active');
+        }
+        function closeCustomAlert() {
+            document.getElementById('customAlertOverlay').classList.remove('active');
+        }
+
+        function customConfirm(msg, callback) {
+            document.getElementById('customConfirmMsg').innerHTML = msg;
+            confirmCallback = callback;
+            document.getElementById('customConfirmOverlay').classList.add('active');
+        }
+        function closeCustomConfirm() {
+            document.getElementById('customConfirmOverlay').classList.remove('active');
+            confirmCallback = null;
+        }
+        document.getElementById('customConfirmYes').addEventListener('click', () => {
+            document.getElementById('customConfirmOverlay').classList.remove('active');
+            if (confirmCallback) confirmCallback();
+            confirmCallback = null;
+        });
+
+        function customPrompt(msg, defaultVal, callback) {
+            document.getElementById('customPromptMsg').innerHTML = msg;
+            const input = document.getElementById('customPromptInput');
+            input.value = defaultVal || '';
+            promptCallback = callback;
+            document.getElementById('customPromptOverlay').classList.add('active');
+            input.focus();
+        }
+        function closeCustomPrompt() {
+            document.getElementById('customPromptOverlay').classList.remove('active');
+            promptCallback = null;
+        }
+        document.getElementById('customPromptYes').addEventListener('click', () => {
+            const val = document.getElementById('customPromptInput').value.trim();
+            document.getElementById('customPromptOverlay').classList.remove('active');
+            if (promptCallback) promptCallback(val);
+            promptCallback = null;
+        });
+
+
+        /* 오디오 플레이어 기능 */
+        const tracks = ['s1.mp3', 's2.mp3', 's3.mp3', 's4.mp3', 's5.mp3', 's6.mp3', 's7.mp3'];
+        let currentTrackIndex = 0;
+        const player = document.getElementById('bgm-player');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const trackDisplay = document.getElementById('track-display');
+        const volumeSlider = document.getElementById('volume-slider');
+
+        function initAudio() {
+            const consent = localStorage.getItem('gugudan_audio_consent');
+            if (!consent) {
+                document.getElementById('consentOverlay').classList.add('active');
+            } else {
+                loadAudioState();
+            }
+        }
+
+        function acceptConsent(allow) {
+            document.getElementById('consentOverlay').classList.remove('active');
+            localStorage.setItem('gugudan_audio_consent', allow ? 'true' : 'false');
+            if (allow) {
+                currentTrackIndex = 0;
+                player.src = tracks[currentTrackIndex];
+                player.volume = volumeSlider.value;
+                playTrack();
+            } else {
+                loadAudioState(false); 
+            }
+        }
+
+        function loadAudioState(autoPlay = true) {
+            const consent = localStorage.getItem('gugudan_audio_consent');
+            if (consent === 'false') autoPlay = false; 
+
+            const stateStr = localStorage.getItem('gugudan_audio_state');
+            if (stateStr) {
+                const state = JSON.parse(stateStr);
+                currentTrackIndex = state.trackIndex || 0;
+                player.src = tracks[currentTrackIndex];
+                
+                player.volume = state.volume !== undefined ? state.volume : 0.5;
+                volumeSlider.value = player.volume;
+
+                player.addEventListener('loadedmetadata', function onMeta() {
+                    player.currentTime = state.currentTime || 0;
+                    player.removeEventListener('loadedmetadata', onMeta);
+                });
+                
+                updateTrackDisplay();
+                
+                if (state.isPlaying && autoPlay) {
+                    player.play().then(() => {
+                        playPauseBtn.innerText = '⏸';
+                    }).catch(e => {
+                        console.log('Auto-play blocked');
+                        playPauseBtn.innerText = '▶';
+                    });
+                } else {
+                    playPauseBtn.innerText = '▶';
+                }
+            } else {
+                player.src = tracks[0];
+                player.volume = 0.5;
+                volumeSlider.value = 0.5;
+                updateTrackDisplay();
+            }
+        }
+
+        function saveAudioState() {
+            const state = {
+                trackIndex: currentTrackIndex,
+                currentTime: player.currentTime,
+                isPlaying: !player.paused,
+                volume: player.volume
+            };
+            localStorage.setItem('gugudan_audio_state', JSON.stringify(state));
+        }
+
+        function togglePlay() {
+            if (player.paused) {
+                player.play();
+                playPauseBtn.innerText = '⏸';
+            } else {
+                player.pause();
+                playPauseBtn.innerText = '▶';
+            }
+            saveAudioState();
+        }
+
+        function playTrack() {
+            player.src = tracks[currentTrackIndex];
+            player.play().then(() => {
+                playPauseBtn.innerText = '⏸';
+            }).catch(e => console.log('Auto-play blocked'));
+            updateTrackDisplay();
+            saveAudioState();
+        }
+
+        function prevTrack() {
+            currentTrackIndex = (currentTrackIndex - 1 + tracks.length) % tracks.length;
+            playTrack();
+        }
+
+        function nextTrack() {
+            currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+            playTrack();
+        }
+
+        function changeVolume() {
+            player.volume = volumeSlider.value;
+            saveAudioState();
+        }
+
+        function updateTrackDisplay() {
+            trackDisplay.innerText = `Track ${currentTrackIndex + 1}`;
+        }
+
+        player.addEventListener('timeupdate', () => {
+            if (Math.floor(player.currentTime) % 2 === 0) {
+                saveAudioState();
+            }
+        });
+        player.addEventListener('ended', nextTrack);
+
+        // 로컬 스토리지 데이터 관리
+        function saveData() {
+            localStorage.setItem('gugudan_rooms', JSON.stringify(rooms));
+            localStorage.setItem('gugudan_newbies', JSON.stringify(newbies));
+            localStorage.setItem('gugudan_regulars', JSON.stringify(regulars));
+        }
+
+        function loadData() {
+            const savedRooms = localStorage.getItem('gugudan_rooms');
+            const savedNewbies = localStorage.getItem('gugudan_newbies');
+            const savedRegulars = localStorage.getItem('gugudan_regulars');
+            
+            if (savedRooms) rooms = JSON.parse(savedRooms);
+            if (savedNewbies) newbies = JSON.parse(savedNewbies);
+            if (savedRegulars) regulars = JSON.parse(savedRegulars);
+        }
+
+        function handleEnter(e, type) {
+            if (e.key === 'Enter') {
+                if (type === 'newbie') addNewbie(false); // 기본은 새싹조
+                else if (type === 'regular') addRegular();
+            }
+        }
+
+        function addNewbie(isRotten = false) {
+            const nameInput = document.getElementById('newbie-input');
+            const name = nameInput.value.trim();
+            const roomName = `${rooms.length + 1}조`; 
+            
+            if (!name) return;
+            
+            if (newbies.includes(name) || regulars.includes(name)) {
+                customAlert('이미 등록된 닉네임입니다!');
+                return;
+            }
+            
+            if (rooms.length >= MAX_ROOMS) {
+                customAlert('최대 4개 조까지만 생성 가능합니다.<br>일반조원으로 추가됩니다.');
+                regulars.push(name);
+                nameInput.value = '';
+                nameInput.focus();
+                saveData();
+                renderWaitingPool();
+                return;
+            }
+            
+            newbies.push(name);
+            rooms.push({
+                id: Date.now(),
+                roomName: roomName,
+                newbie: name,
+                isRotten: isRotten, // 썩은싹 여부 저장
+                members: []
+            });
+            
+            nameInput.value = '';
+            nameInput.focus();
+            saveData();
+            renderRooms();
+        }
+
+        function editRoomName(roomId, currentName) {
+            customPrompt('새로운 조 이름을 입력하세요.', currentName, (newName) => {
+                if (newName) {
+                    const room = rooms.find(r => r.id === roomId);
+                    if (room) {
+                        room.roomName = newName;
+                        saveData();
+                        renderRooms();
+                    }
+                }
+            });
+        }
+
+        function addRegular() {
+            const input = document.getElementById('regular-input');
+            const name = input.value.trim();
+            
+            if (!name) return;
+            
+            if (regulars.includes(name) || newbies.includes(name)) {
+                customAlert('이미 등록된 닉네임입니다!');
+                return;
+            }
+            
+            const isAlreadyInRoom = rooms.some(room => room.members.includes(name));
+            if (isAlreadyInRoom) {
+                customAlert('이미 매칭된 일반조원입니다!');
+                return;
+            }
+            
+            regulars.push(name);
+            input.value = '';
+            input.focus();
+            saveData();
+            renderWaitingPool();
+        }
+
+        function removeRegular(name) {
+            regulars = regulars.filter(r => r !== name);
+            saveData();
+            renderWaitingPool();
+        }
+
+        function removeRoom(id, newbieName) {
+            customConfirm(`'${newbieName}' 방장의 조를 삭제하시겠습니까?<br>안의 조원들은 대기열로 돌아갑니다.`, () => {
+                newbies = newbies.filter(n => n !== newbieName);
+                const roomIndex = rooms.findIndex(r => r.id === id);
+                
+                if (roomIndex > -1) {
+                    regulars.push(...rooms[roomIndex].members);
+                    rooms.splice(roomIndex, 1);
+                }
+                
+                saveData();
+                renderWaitingPool();
+                renderRooms();
+            });
+        }
+
+        function softReset() {
+            customConfirm('조 편성을 초기화하시겠습니까?<br>등록된 닉네임은 유지되며 모든 조원이 대기열로 돌아갑니다.', () => {
+                rooms.forEach(room => {
+                    regulars.push(...room.members);
+                    room.members = [];
+                });
+                saveData();
+                renderWaitingPool();
+                renderRooms();
+            });
+        }
+
+        function hardReset() {
+            customConfirm('모든 데이터를 삭제하고 처음부터 다시 시작하시겠습니까?<br>이 작업은 되돌릴 수 없습니다.', () => {
+                newbies = [];
+                regulars = [];
+                rooms = [];
+                
+                localStorage.clear(); 
+                renderWaitingPool();
+                renderRooms();
+                window.location.reload(); 
+            });
+        }
+
+        function renderWaitingPool() {
+            const list = document.getElementById('regular-list');
+            document.getElementById('regular-count').innerText = regulars.length;
+            
+            if (regulars.length === 0) {
+                list.innerHTML = `
+                    <div style="color: rgba(255,255,255,0.4); font-size: 0.9rem; margin-top: 0.5rem; width: 100%;">
+                        대기열이 비어있습니다.
+                    </div>`;
+                return;
+            }
+
+            list.innerHTML = regulars.map(name => 
+                `<div class="badge">
+                    <span>${name}</span>
+                    <span class="remove" onclick="removeRegular('${name}')" title="삭제">&times;</span>
+                </div>`
+            ).join('');
+        }
+
+        function renderRooms() {
+            const container = document.getElementById('rooms-container');
+            
+            if (rooms.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; color: rgba(255,255,255,0.4); padding: 4rem; background: var(--panel-bg); border-radius: 20px; border: 1px dashed rgba(34, 197, 94, 0.3);">
+                        방장을 등록하면 최대 4개까지 조가 생성됩니다.<br>(새싹조 / 썩은싹조 생성 가능)
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = rooms.map((room, index) => {
+                const maxMembersToAdd = MAX_MEMBERS_PER_ROOM - 1; 
+                const isFull = room.members.length >= maxMembersToAdd;
+                const totalCount = 1 + room.members.length;
+                const roomName = room.roomName || `${index + 1}조`;
+                const roomClass = room.isRotten ? 'rotten-room' : '';
+                const memberClass = room.isRotten ? 'rotten' : 'newbie';
+                const icon = room.isRotten ? '🥀' : '🌱';
+                
+                return `
+                <div class="room glass ${isFull ? 'full-room' : ''} ${roomClass}">
+                    <span class="remove-room" onclick="removeRoom(${room.id}, '${room.newbie}')" title="방 삭제">&times;</span>
+                    <div class="room-header">
+                        <div class="room-title" onclick="editRoomName(${room.id}, '${roomName}')" title="클릭해서 조 이름 변경">
+                            ${roomName} <span class="edit-icon">✏️</span>
+                        </div>
+                        <div class="room-count">${totalCount}/${MAX_MEMBERS_PER_ROOM}명</div>
+                    </div>
+                    <div class="room-members">
+                        <div class="member ${memberClass}">
+                            <span class="member-icon">${icon}</span>
+                            <span style="font-weight: 700;">${room.newbie}</span>
+                        </div>
+                        ${room.members.map(member => `
+                            <div class="member regular">
+                                <span class="member-icon">👤</span>
+                                <span>${member}</span>
+                            </div>
+                        `).join('')}
+                        ${Array(Math.max(0, maxMembersToAdd - room.members.length)).fill(`
+                            <div class="member empty">
+                                <span>+ 빈 자리</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function randomMatch() {
+            if (rooms.length === 0) {
+                customAlert('먼저 방장을 등록해서 조를 생성해주세요!');
+                return;
+            }
+            
+            const maxMembersToAdd = MAX_MEMBERS_PER_ROOM - 1;
+            const totalEmptySlots = rooms.reduce((acc, room) => acc + (maxMembersToAdd - room.members.length), 0);
+            
+            if (regulars.length === 0 && totalEmptySlots === 0) {
+                customAlert('매칭할 대기 인원이 없습니다!');
+                return;
+            }
+
+            rooms.forEach(room => {
+                regulars.push(...room.members);
+                room.members = [];
+            });
+            
+            let shuffled = [...regulars];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            
+            let regularIndex = 0;
+            let keepMatching = true;
+            
+            while (keepMatching && regularIndex < shuffled.length) {
+                let addedInRound = false;
+                for (let room of rooms) {
+                    if (room.members.length < maxMembersToAdd && regularIndex < shuffled.length) {
+                        room.members.push(shuffled[regularIndex]);
+                        regularIndex++;
+                        addedInRound = true;
+                    }
+                }
+                if (!addedInRound) {
+                    keepMatching = false;
+                }
+            }
+            
+            regulars = shuffled.slice(regularIndex); // 꽉 차고 남은 인원은 대기열에 보존됨
+            
+            saveData();
+            renderWaitingPool();
+            renderRooms();
+            
+            const matchBtn = document.querySelector('.match-btn');
+            matchBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => { matchBtn.style.transform = 'none'; }, 150);
+        }
+
+        // 초기화
+        loadData();
+        renderWaitingPool();
+        renderRooms();
+        initAudio();
+    </script>
+</body>
+</html>
