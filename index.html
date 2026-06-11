@@ -538,7 +538,7 @@
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
-        const db = firebase.database();
+        window.db = firebase.database();
     </script>
 
     <script>
@@ -838,36 +838,58 @@
             const roomId = document.getElementById('editRoomId').value;
             
             if (newName && newName !== '') {
-                let savedRooms = localStorage.getItem('gugudan_rooms');
-                if (savedRooms) {
-                    let rList = JSON.parse(savedRooms);
-                    let target = rList.find(r => r.id == roomId);
-                    if (target && target.roomName !== newName) {
-                        target.roomName = newName;
-                        localStorage.setItem('gugudan_rooms', JSON.stringify(rList));
-                        refreshDashboards(); // 현재 화면 즉시 갱신
-                    }
+                let target = rooms.find(r => r.id == roomId);
+                if (target && target.roomName !== newName) {
+                    target.roomName = newName;
+                    const roomsObj = {};
+                    rooms.forEach((r, idx) => roomsObj[idx] = r);
+                    window.db.ref('gugudan_rooms').set(roomsObj);
                 }
             }
             document.getElementById('customPromptOverlay').classList.remove('active');
         }
 
         function refreshDashboards() {
-            loadData();
             renderTeamRanking();
             renderIndivRankingAndMVP();
             renderRooms();
         }
 
-        // 초기 렌더링
-        refreshDashboards();
+        /* 데이터 정규화 및 Firebase 연동 */
+        function normalizeRooms(data) {
+            if (!data) return [];
+            let rawRooms = Array.isArray(data) ? data : Object.values(data);
+            return rawRooms.filter(r => r !== null && r !== undefined).map(r => {
+                if (!r.members) r.members = [];
+                return r;
+            });
+        }
 
-        // 다른 탭(관리자 페이지)에서 데이터 변경 시 실시간 반영
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'gugudan_rooms' || e.key === 'gugudan_scores') {
-                refreshDashboards();
-            }
+        function normalizeScores(data) {
+            let s = data || {};
+            if (!s.teams) s.teams = {};
+            if (!s.individuals) s.individuals = {};
+            if (!s.tieBreakers) s.tieBreakers = { teams: {}, indivs: {} };
+            if (!s.tieBreakers.teams) s.tieBreakers.teams = {};
+            if (!s.tieBreakers.indivs) s.tieBreakers.indivs = {};
+            return s;
+        }
+
+        const roomsRef = window.db.ref('gugudan_rooms');
+        const scoresRef = window.db.ref('gugudan_scores');
+
+        roomsRef.on('value', (snapshot) => {
+            rooms = normalizeRooms(snapshot.val());
+            refreshDashboards();
         });
+
+        scoresRef.on('value', (snapshot) => {
+            scores = normalizeScores(snapshot.val());
+            refreshDashboards();
+        });
+
+        // 초기화
+        initAudio();
     </script>
 </body>
 </html>
