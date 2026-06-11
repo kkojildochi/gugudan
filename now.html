@@ -752,7 +752,7 @@
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
-        const db = firebase.database();
+        window.db = firebase.database();
     </script>
 
     <script>
@@ -917,31 +917,44 @@
         });
         player.addEventListener('ended', nextTrack);
 
-        // Firebase Database 참조
-        const roomsRef = db.ref('gugudan_rooms');
-        const scoresRef = db.ref('gugudan_scores');
+        /* 데이터 정규화 및 Firebase 연동 */
+        function normalizeRooms(data) {
+            if (!data) return [];
+            let rawRooms = Array.isArray(data) ? data : Object.values(data);
+            return rawRooms.filter(r => r !== null && r !== undefined).map(r => {
+                if (!r.members) r.members = [];
+                return r;
+            });
+        }
 
-        // 데이터 실시간 수신
+        function normalizeScores(data) {
+            let s = data || {};
+            if (!s.teams) s.teams = {};
+            if (!s.individuals) s.individuals = {};
+            if (!s.tieBreakers) s.tieBreakers = { teams: {}, indivs: {} };
+            if (!s.tieBreakers.teams) s.tieBreakers.teams = {};
+            if (!s.tieBreakers.indivs) s.tieBreakers.indivs = {};
+            return s;
+        }
+
+        const roomsRef = window.db.ref('gugudan_rooms');
+        const scoresRef = window.db.ref('gugudan_scores');
+
         roomsRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            rooms = data ? Object.values(data) : [];
+            rooms = normalizeRooms(snapshot.val());
             
             // rooms가 들어왔을 때, scores 구조가 없다면 초기화 방어
             rooms.forEach(room => {
                 if (!scores.teams[room.id]) scores.teams[room.id] = { bomb: 0 };
             });
-            
             renderAll();
         });
 
         scoresRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                scores = data;
-                if (!scores.tieBreakers) scores.tieBreakers = { teams: {}, indivs: {} };
-            } else {
-                scores = { teams: {}, individuals: {}, tieBreakers: { teams: {}, indivs: {} } };
-                // 점수가 아예 없는 경우 기본 폼 세팅
+            scores = normalizeScores(snapshot.val());
+            
+            // 점수가 아예 없는 경우 기본 폼 세팅
+            if (Object.keys(scores.teams).length === 0) {
                 rooms.forEach(room => {
                     if (!scores.teams[room.id]) scores.teams[room.id] = { bomb: 0 };
                 });
@@ -1252,9 +1265,9 @@
 
         function hardReset() {
             customConfirm('모든 데이터를 삭제하고 처음부터 다시 시작하시겠습니까?<br>이 작업은 되돌릴 수 없습니다.', () => {
-                db.ref('gugudan_rooms').remove();
-                db.ref('gugudan_scores').remove();
-                localStorage.clear();
+                window.db.ref('gugudan_rooms').remove();
+                window.db.ref('gugudan_scores').remove();
+                localStorage.clear(); 
                 window.location.href = 'group.html';
             });
         }
