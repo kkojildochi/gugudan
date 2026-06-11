@@ -520,6 +520,11 @@
         </div>
     </div>
 
+    <!-- Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="firebase-config.js"></script>
+
     <script>
         /* --- 오디오 플레이어 제어 로직 --- */
         const tracks = ['s1.mp3', 's2.mp3', 's3.mp3', 's4.mp3', 's5.mp3', 's6.mp3', 's7.mp3'];
@@ -629,19 +634,12 @@
 
         function changeVolume() {
             player.volume = volumeSlider.value;
-            saveAudioState();
         }
 
-        function updateTrackDisplay() {
-            trackDisplay.innerText = `Track ${currentTrackIndex + 1}`;
+        function initAudio() {
+            player.volume = 0.5;
+            updateTrackDisplay();
         }
-
-        player.addEventListener('timeupdate', () => {
-            if (Math.floor(player.currentTime) % 2 === 0) {
-                saveAudioState();
-            }
-        });
-        player.addEventListener('ended', nextTrack);
 
         /* --- 비밀번호 연동 --- */
         function openPwModal() {
@@ -662,17 +660,9 @@
             }
         }
 
-        /* --- 랭킹 현황판 및 데이터 연동 로직 (읽기 전용) --- */
+        /* --- 랭킹 현황판 및 데이터 연동 로직 --- */
         let rooms = [];
         let scores = { teams: {}, individuals: {}, tieBreakers: { teams: {}, indivs: {} } };
-
-        function loadData() {
-            const savedRooms = localStorage.getItem('gugudan_rooms');
-            if (savedRooms) rooms = JSON.parse(savedRooms);
-
-            const savedScores = localStorage.getItem('gugudan_scores');
-            if (savedScores) scores = JSON.parse(savedScores);
-        }
 
         function getTieBreaker(type, id) {
             if (!scores.tieBreakers) return 0;
@@ -698,6 +688,7 @@
 
         function renderTeamRanking() {
             const list = document.getElementById('team-ranking-list');
+            if (!list) return;
             if (rooms.length === 0) {
                 list.innerHTML = '<div style="color: gray; text-align: center; padding: 2rem;">아직 편성된 조가 없습니다.</div>';
                 return;
@@ -725,13 +716,14 @@
         function renderIndivRankingAndMVP() {
             const list = document.getElementById('indiv-ranking-list');
             const mvpContainer = document.getElementById('mvp-display');
+            if (!list) return;
             
             let allMembers = [];
             let mvpCandidates = [];
 
             rooms.forEach(room => {
                 const teamScore = getTeamTotal(room.id);
-                const members = [room.newbie, ...room.members];
+                const members = [room.newbie, ...(room.members || [])];
                 
                 members.forEach(member => {
                     if (!member) return;
@@ -749,7 +741,6 @@
                 return;
             }
 
-            // 개인전 TOP 5 계산
             const rankedIndivs = allMembers.map(name => {
                 return { name, score: getIndivTotal(name) };
             }).sort((a, b) => {
@@ -758,21 +749,16 @@
             });
 
             const topIndivs = rankedIndivs.slice(0, 5);
-            if (topIndivs[0].score === 0) {
-                 list.innerHTML = '<div style="color: gray; text-align: center; padding: 2rem;">아직 집계된 개인 점수가 없습니다.</div>';
-            } else {
-                list.innerHTML = topIndivs.map((indiv, idx) => `
-                    <div class="rank-item rank-${idx + 1}" style="padding: 0.8rem 1.2rem;">
-                        <div class="rank-info">
-                            <div class="rank-badge" style="width:24px; height:24px; font-size:0.9rem;">${idx + 1}</div>
-                            <div style="font-size: 1.05rem;">${indiv.name}</div>
-                        </div>
-                        <div class="score-val" style="font-size: 1.1rem;">${indiv.score}점</div>
+            list.innerHTML = topIndivs.map((indiv, idx) => `
+                <div class="rank-item rank-${idx + 1}" style="padding: 0.8rem 1.2rem;">
+                    <div class="rank-info">
+                        <div class="rank-badge" style="width:24px; height:24px; font-size:0.9rem;">${idx + 1}</div>
+                        <div style="font-size: 1.05rem;">${indiv.name}</div>
                     </div>
-                `).join('');
-            }
+                    <div class="score-val" style="font-size: 1.1rem;">${indiv.score}점</div>
+                </div>
+            `).join('');
 
-            // MVP 계산
             mvpCandidates.sort((a, b) => {
                 if (b.score !== a.score) return b.score - a.score;
                 return getTieBreaker('indiv', b.name) - getTieBreaker('indiv', a.name);
@@ -788,8 +774,9 @@
 
         function renderRooms() {
             const container = document.getElementById('rooms-container');
+            if (!container) return;
             if (rooms.length === 0) {
-                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: gray;">아직 편성된 조가 없습니다. 관리자가 편성을 완료하면 여기에 표시됩니다.</div>';
+                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: gray;">아직 편성된 조가 없습니다.</div>';
                 return;
             }
 
@@ -798,7 +785,7 @@
                 const roomClass = room.isRotten ? 'rotten-room' : '';
                 const allMembers = [
                     { name: room.newbie, type: room.isRotten ? 'rotten' : 'newbie', icon: room.isRotten ? '🥀' : '🌱' },
-                    ...room.members.map(m => ({ name: m, type: 'regular', icon: '👤' }))
+                    ...(room.members || []).map(m => ({ name: m, type: 'regular', icon: '👤' }))
                 ];
 
                 return `
