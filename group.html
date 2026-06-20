@@ -433,6 +433,13 @@
             border: 1px dashed rgba(255, 255, 255, 0.15);
             background: transparent;
             color: #64748b;
+            transition: all 0.2s;
+        }
+        .member.empty:hover {
+            opacity: 0.8;
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(34, 197, 94, 0.05);
         }
 
         /* 커스텀 모달 */
@@ -676,6 +683,20 @@
             <div class="custom-alert-buttons">
                 <button class="primary-btn" onclick="acceptConsent(true)">동의</button>
                 <button class="reset-btn" onclick="acceptConsent(false)">동의 안함</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Assign Modal -->
+    <div id="manualAssignOverlay" class="custom-alert-overlay">
+        <div class="custom-alert-box glass">
+            <h3 style="margin-top:0; margin-bottom:1rem; color:var(--primary);">대기 인원 선택</h3>
+            <p style="font-size:0.9rem; color:rgba(255,255,255,0.7); margin-bottom:1rem;">조에 추가할 인원을 선택해주세요.</p>
+            <div id="manualAssignList" class="badge-container" style="max-height: 200px; overflow-y: auto; padding: 0.5rem; justify-content:center;">
+                <!-- 동적 렌더링 -->
+            </div>
+            <div class="custom-alert-buttons" style="margin-top:1.5rem;">
+                <button class="reset-btn" onclick="closeManualAssignModal()">닫기</button>
             </div>
         </div>
     </div>
@@ -1034,6 +1055,60 @@
             });
         }
 
+        /* 수동 배정 로직 */
+        let activeAssignRoomId = null;
+
+        function openManualAssignModal(roomId) {
+            if (regulars.length === 0) {
+                customAlert('대기열에 배정할 인원이 없습니다!');
+                return;
+            }
+            activeAssignRoomId = roomId;
+            const container = document.getElementById('manualAssignList');
+            container.innerHTML = regulars.map(name => 
+                `<div class="badge" onclick="assignMemberToRoom('${name}')" style="cursor:pointer; transition:all 0.2s; border:1px solid rgba(255,255,255,0.2);" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)'">
+                    <span>${name}</span>
+                    <span style="color:var(--primary); font-weight:bold; margin-left:5px;">+</span>
+                </div>`
+            ).join('');
+            document.getElementById('manualAssignOverlay').classList.add('active');
+        }
+
+        function closeManualAssignModal() {
+            document.getElementById('manualAssignOverlay').classList.remove('active');
+            activeAssignRoomId = null;
+        }
+
+        function assignMemberToRoom(name) {
+            if (!activeAssignRoomId) return;
+            const room = rooms.find(r => r.id === activeAssignRoomId);
+            if (!room) return;
+            
+            // Remove from regulars
+            regulars = regulars.filter(r => r !== name);
+            // Add to room
+            room.members.push(name);
+            
+            saveRooms();
+            renderWaitingPool();
+            renderRooms();
+            closeManualAssignModal();
+        }
+
+        function removeMemberFromRoom(roomId, name) {
+            customConfirm(`'${name}'님을 조에서 빼고 대기열로 돌려보내시겠습니까?`, () => {
+                const room = rooms.find(r => r.id === roomId);
+                if (!room) return;
+                
+                room.members = room.members.filter(m => m !== name);
+                regulars.push(name);
+                
+                saveRooms();
+                renderWaitingPool();
+                renderRooms();
+            });
+        }
+
         function softReset() {
             customConfirm('조 편성을 초기화하시겠습니까?<br>등록된 닉네임은 유지되며 모든 조원이 대기열로 돌아갑니다.', () => {
                 rooms.forEach(room => {
@@ -1118,13 +1193,16 @@
                             <span style="font-weight: 700;">${room.newbie}</span>
                         </div>
                         ${room.members.map(member => `
-                            <div class="member regular">
-                                <span class="member-icon">👤</span>
-                                <span>${member}</span>
+                            <div class="member regular" style="justify-content: space-between;">
+                                <div style="display:flex; align-items:center; gap:0.8rem;">
+                                    <span class="member-icon">👤</span>
+                                    <span>${member}</span>
+                                </div>
+                                <span class="remove" onclick="removeMemberFromRoom(${room.id}, '${member}')" title="대기열로 빼기" style="cursor:pointer; font-size:1.2rem; color:rgba(255,255,255,0.4); padding-right:5px;">&times;</span>
                             </div>
                         `).join('')}
                         ${Array(Math.max(0, maxMembersToAdd - room.members.length)).fill(`
-                            <div class="member empty">
+                            <div class="member empty" style="cursor:pointer;" onclick="openManualAssignModal(${room.id})" title="대기 인원에서 조원 추가">
                                 <span>+ 빈 자리</span>
                             </div>
                         `).join('')}
